@@ -1,0 +1,33 @@
+{
+  "manifestVersion": "1",
+  "id": "moon",
+  "name": "Moon Phase",
+  "description": "A full-screen daily lunar display for digital signage - tonight's Moon phase and illumination rendered to the exact hemisphere, with the upcoming New, First Quarter, Full and Last Quarter phases. Location is auto-detected by IP or set per screen.",
+  "summary": "Tonight's Moon phase and the phases ahead.",
+  "vendor": "Screenly",
+  "tags": ["Moon", "Astronomy", "Almanac"],
+  "homepage": "https://moon.srly.io/",
+  "source": "https://github.com/Screenly-Labs/moon",
+  "support": "https://github.com/Screenly-Labs/moon/issues",
+  "playback": { "pacing": "fixed", "refreshIntervalS": 3600 },
+  "settings": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+      "location": {
+        "type": "object",
+        "title": "Location",
+        "description": "Optional. Leave unset to auto-detect the screen's location by IP. Sets the hemisphere the Moon is drawn for and the timezone of the dates.",
+        "x-widget": "location-map",
+        "properties": {
+          "lat": { "type": "number" },
+          "lng": { "type": "number" }
+        }
+      }
+    }
+  },
+  "launch": {
+    "baseUrl": "https://moon.srly.io/",
+    "template": "{?location*}"
+  }
+}
