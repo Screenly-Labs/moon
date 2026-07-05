@@ -1,0 +1,19 @@
+dist
+node_modules
+worker
+.dev.vars
+.wrangler
+package-lock.json
+.cargo-ok
+
+# Built client bundle (compiled from assets/static/js/main.ts by build.ts)
+assets/static/js/main.js
+
+# Vendored at build from @fontsource (see sync-fonts.ts)
+assets/static/fonts/*.woff2
+
+.DS_Store
+**/.DS_Store
+
+# Output of 'npm pack'
+*.tgz
