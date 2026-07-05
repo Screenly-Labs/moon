@@ -35,6 +35,16 @@ const Layout = (props: LayoutProps) => html`<!DOCTYPE html>
         crossorigin
       />
       <link rel="stylesheet" href="/static/styles/main.css?v=${props.v}" />
+      <!-- Google Analytics 4 -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-QGK9VDL805"></script>
+      <script>
+        window.dataLayer = window.dataLayer || []
+        function gtag() {
+          dataLayer.push(arguments)
+        }
+        gtag('js', new Date())
+        gtag('config', 'G-QGK9VDL805')
+      </script>
       <!-- main.js is the bundled, self-executing classic script (no ES module
            export), so a plain async <script> runs it and any cached HTML stays
            compatible across deploys. The ?v= busts it whenever the bundle
