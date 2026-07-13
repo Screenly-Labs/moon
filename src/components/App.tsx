@@ -83,7 +83,6 @@ const App = ({ lat, lng, city = '', country = '', timezone = '', v }: AppProps) 
         </section>
 
         <footer class='colophon'>
-          <p class='colophon__note'>Lunar phases computed locally</p>
           <a
             class='brand'
             href='https://www.screenly.io'
