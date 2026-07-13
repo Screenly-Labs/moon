@@ -10,29 +10,10 @@
    build.js minifies this file in place.
    ========================================================================= */
 
-/* ---- Webfonts: self-hosted, vendored from Bun-managed @fontsource ---------
-   (see sync-fonts.js). Fraunces "standard" axis = optical-size + weight. */
-@font-face {
-  font-family: "Fraunces";
-  font-style: normal;
-  font-weight: 100 900;
-  font-display: swap;
-  src: url("/static/fonts/fraunces-latin-standard-normal.woff2") format("woff2");
-}
-@font-face {
-  font-family: "Fraunces";
-  font-style: italic;
-  font-weight: 100 900;
-  font-display: swap;
-  src: url("/static/fonts/fraunces-latin-standard-italic.woff2") format("woff2");
-}
-@font-face {
-  font-family: "JetBrains Mono";
-  font-style: normal;
-  font-weight: 100 800;
-  font-display: swap;
-  src: url("/static/fonts/jetbrains-mono-latin-wght-normal.woff2") format("woff2");
-}
+/* Webfonts (@font-face) and the standardized footer badge (.brand) come from
+   @screenly-labs/signage-kit — build.ts prepends styles/fonts.css + styles/brand.css
+   to this file before down-leveling. This file keeps the app's own tokens, reset,
+   fluid root, and "Observatory" component styles. */
 
 :root {
   --night-1: #0a0f24; /* zenith — deep indigo */
@@ -283,26 +264,8 @@ body {
   color: var(--star-dim);
 }
 
-/* ---- Colophon ------------------------------------------------------------ */
-.colophon {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-  width: 100%;
-  max-width: 44rem;
-  margin-top: clamp(1rem, 3vh, 2rem);
-  font-size: 0.72rem;
-  letter-spacing: 0.04em;
-  color: var(--star-dim);
-}
-
-.brand img {
-  display: block;
-  height: 1.05rem;
-  width: auto;
-  opacity: 0.9;
-}
+/* The footer Screenly badge is the kit's standardized fixed corner .brand
+   (prepended from styles/brand.css); no app-specific badge rules needed. */
 
 /* ---- Motion -------------------------------------------------------------- */
 @keyframes twinkle {
