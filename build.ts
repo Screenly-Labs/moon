@@ -5,7 +5,9 @@
 // degraded-mode kill-switch is prepended to the CSS by the kit (includeDegraded),
 // so it lives in the package, not here. main.js is a gitignored artifact; pass
 // --client to skip the CSS step (used by `bun run dev`, keeping working-tree CSS
-// unminified for editing).
+// unminified for editing). Note: --client also skips the includeDegraded
+// injection, so a `bun run dev` build serves no html.legacy kill-switch — build
+// without --client to exercise degraded mode locally.
 
 import { Glob } from 'bun'
 import { bundleJs, processCss } from '@screenly-labs/signage-kit/build'
