@@ -6,11 +6,11 @@
 //   assets/static/js/main.ts  --bundle+minify-->  assets/static/js/main.js
 //
 // main.ts is the only JS *entry*. It imports ./moon (the unit-tested pure
-// helpers) and the `suncalc` dependency; `external: []` tells Bun to inline
-// both, so the emitted main.js is a self-executing classic script with no
-// `export` token — loadable by every cached HTML variant (plain <script> or
-// type="module"). moon.ts is a dependency, not an entry, so it is never
-// built/served on its own.
+// helpers) and the `suncalc` dependency; esbuild bundles both in and emits an
+// IIFE, so the served main.js is a self-executing classic script with no
+// `export`/`import` token — loadable by every cached HTML variant (plain
+// <script> or type="module"). moon.ts is a dependency, not an entry, so it is
+// never built/served on its own.
 //
 // The emitted main.js is a build artifact (gitignored). CSS is minified in
 // place (it is authored and served at the same path); pass --client to skip the
@@ -25,9 +25,10 @@ import { run as syncFonts } from './sync-fonts'
 
 const clientOnly = process.argv.includes('--client')
 
-// Single browser-support floor for the whole build: the `browserslist` field in
-// package.json drives both the CSS down-leveling (Lightning CSS) and the JS
-// syntax floor, so old signage players get a build they can actually run. See
+// The `browserslist` field in package.json is the CSS support floor: Lightning
+// CSS down-levels the stylesheet to it. The JS is lowered separately by esbuild to
+// a fixed ES2017 syntax floor (kept at/below the browserslist minimum); esbuild
+// can't read browserslist, so keep the two in sync if you change the floor. See
 // the degraded-mode notes in Layout.tsx / main.css.
 const cssTargets = browserslistToTargets(browserslist())
 
@@ -67,13 +68,19 @@ if (!clientOnly) {
   }
 
   for (const path of cssEntries) {
-    const { code } = lightningcss({
-      filename: path,
-      code: await Bun.file(path).bytes(),
-      minify: true,
-      targets: cssTargets
-    })
-    await Bun.write(path, code)
+    try {
+      const { code } = lightningcss({
+        filename: path,
+        code: await Bun.file(path).bytes(),
+        minify: true,
+        targets: cssTargets
+      })
+      await Bun.write(path, code)
+    } catch (error) {
+      console.error(`✗ Failed to build ${path}`)
+      console.error(error)
+      process.exit(1)
+    }
     console.log(`✓ CSS: ${path}`)
   }
 }

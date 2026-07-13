@@ -10,8 +10,8 @@ import {
   nextPrincipalPhases
 } from './moon'
 
-// This file is bundled by Bun.build (inlining ./moon and the suncalc dep) into a
-// self-contained classic script with NO top-level `export`, so it loads from a
+// This file is bundled by esbuild (inlining ./moon and the suncalc dep) into a
+// self-contained IIFE with NO top-level `export`/`import`, so it loads from a
 // plain <script> and every cached HTML variant runs it identically — same rule
 // as the weather app's main.ts. The testable helpers live in ./moon.
 //
