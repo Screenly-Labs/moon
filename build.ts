@@ -1,79 +1,40 @@
 #!/usr/bin/env bun
-// Builds the static assets. The client source is TypeScript
-// (assets/static/js/main.ts + moon.ts) and browsers can't run TS, so this step
-// produces the *served* file:
-//
-//   assets/static/js/main.ts  --bundle+minify-->  assets/static/js/main.js
-//
-// main.ts is the only JS *entry*. It imports ./moon (the unit-tested pure
-// helpers) and the `suncalc` dependency; esbuild bundles both in and emits an
-// IIFE, so the served main.js is a self-executing classic script with no
-// `export`/`import` token — loadable by every cached HTML variant (plain
-// <script> or type="module"). moon.ts is a dependency, not an entry, so it is
-// never built/served on its own.
-//
-// The emitted main.js is a build artifact (gitignored). CSS is minified in
-// place (it is authored and served at the same path); pass --client to skip the
-// CSS step (used by `bun run dev`, which only needs the JS bundle, so the
-// working-tree CSS stays unminified for editing).
+// Builds the served static assets. The client TS is bundled to a self-executing
+// classic script and the CSS is down-leveled + minified in place, both through
+// @screenly-labs/signage-kit (shared support floor + pipeline). The shared
+// degraded-mode kill-switch is prepended to the CSS by the kit (includeDegraded),
+// so it lives in the package, not here. main.js is a gitignored artifact; pass
+// --client to skip the CSS step (used by `bun run dev`, keeping working-tree CSS
+// unminified for editing).
 
 import { Glob } from 'bun'
-import browserslist from 'browserslist'
-import { build as esbuild } from 'esbuild'
-import { browserslistToTargets, transform as lightningcss } from 'lightningcss'
+import { bundleJs, processCss } from '@screenly-labs/signage-kit/build'
 import { run as syncFonts } from './sync-fonts'
 
 const clientOnly = process.argv.includes('--client')
 
-// The `browserslist` field in package.json is the CSS support floor: Lightning
-// CSS down-levels the stylesheet to it. The JS is lowered separately by esbuild to
-// a fixed ES2017 syntax floor (kept at/below the browserslist minimum); esbuild
-// can't read browserslist, so keep the two in sync if you change the floor. See
-// the degraded-mode notes in Layout.tsx / main.css.
-const cssTargets = browserslistToTargets(browserslist())
-
 // Vendor the Bun-managed webfonts into ./assets first.
 await syncFonts()
 
-// ---- Client JS bundle: main.ts -> main.js --------------------------------
-// esbuild bundles main.ts (inlining ./moon + suncalc + the polyfills shim),
-// lowers modern syntax (?., ??, spread) to the ES2017 floor so old engines can
-// parse it, and emits an IIFE so the output stays a self-contained self-executing
-// classic script loadable from a plain <script> (same guarantee as before).
+// ---- Client JS bundle: main.ts -> main.js (inlining ./moon + suncalc + the
+// shared polyfills shim), a self-contained IIFE at the floor's syntax level.
 try {
-  await esbuild({
-    entryPoints: ['assets/static/js/main.ts'],
-    bundle: true,
-    minify: true,
-    format: 'iife',
-    target: ['es2017'],
-    outfile: 'assets/static/js/main.js'
-  })
+  await bundleJs('assets/static/js/main.ts', 'assets/static/js/main.js')
 } catch (error) {
   console.error('✗ Failed to build assets/static/js/main.ts')
   console.error(error)
   process.exit(1)
 }
-console.log('✓ JS: assets/static/js/main.js (esbuild, iife, es2017)')
+console.log('✓ JS: assets/static/js/main.js')
 
-// ---- CSS: down-level + minify in place (skipped for --client) ------------
-// Lightning CSS down-levels the authored CSS to the browserslist floor (e.g. it
-// rewrites rgb( / a) slash syntax to rgba() for Safari < 12.1 and adds any needed
-// prefixes) and minifies, writing back in place. url(/static/...) refs are left
-// untouched.
+// ---- CSS: down-level + minify in place (skipped for --client), with the shared
+// html.legacy kill-switch prepended by the kit.
 if (!clientOnly) {
-  const cssEntries: string[] = []
   for await (const path of new Glob('assets/static/styles/*.css').scan('.')) {
-    cssEntries.push(path)
-  }
-
-  for (const path of cssEntries) {
     try {
-      const { code } = lightningcss({
-        filename: path,
-        code: await Bun.file(path).bytes(),
-        minify: true,
-        targets: cssTargets
+      const code = await processCss(await Bun.file(path).text(), {
+        includeDegraded: true,
+        filename: path
       })
       await Bun.write(path, code)
     } catch (error) {
