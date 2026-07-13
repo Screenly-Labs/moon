@@ -82,17 +82,15 @@ const App = ({ lat, lng, city = '', country = '', timezone = '', v }: AppProps) 
           </ul>
         </section>
 
-        <footer class='colophon'>
-          <a
-            class='brand'
-            href='https://www.screenly.io'
-            target='_blank'
-            rel='noopener noreferrer'
-            aria-label='Screenly - opens in a new tab'
-          >
-            <img src={`/static/images/screenly-logo.svg?v=${v}`} alt='Screenly' />
-          </a>
-        </footer>
+        <a
+          class='brand'
+          href='https://www.screenly.io'
+          target='_blank'
+          rel='noopener noreferrer'
+          aria-label='Screenly - opens in a new tab'
+        >
+          <img src={`/static/images/screenly-logo.svg?v=${v}`} alt='Screenly' />
+        </a>
 
         <span
           id='location-data'
