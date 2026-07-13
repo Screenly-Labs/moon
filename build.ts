@@ -23,7 +23,7 @@ await syncFonts()
 try {
   await bundleJs('assets/static/js/main.ts', 'assets/static/js/main.js')
 } catch (error) {
-  console.error('✗ Failed to build assets/static/js/main.ts')
+  console.error('✗ JS build failed')
   console.error(error)
   process.exit(1)
 }
@@ -40,7 +40,7 @@ if (!clientOnly) {
       })
       await Bun.write(path, code)
     } catch (error) {
-      console.error(`✗ Failed to build ${path}`)
+      console.error(`✗ CSS build failed (${path})`)
       console.error(error)
       process.exit(1)
     }
