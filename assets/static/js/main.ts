@@ -1,6 +1,7 @@
 // Side-effect import: installs the replaceChildren shim for the older-browser
 // degraded mode (shared across all apps). Must stay first.
 import '@screenly-labs/signage-kit/polyfills'
+import { removeScreenlyBranding } from '@screenly-labs/signage-kit/branding'
 import {
   formatPhaseDate,
   formatToday,
@@ -134,15 +135,6 @@ const render = (loc: MoonLocation): void => {
   renderPhaseList(now, loc, moon.hemisphere)
 
   document.documentElement.dataset.state = 'ready'
-}
-
-// On a Screenly player the viewer is already a Screenly customer, so the
-// promotional Screenly badge is removed. The 'screenly-viewer' token in the
-// user agent marks these devices; every other browser keeps the badge.
-const removeScreenlyBranding = (): void => {
-  if (navigator.userAgent.includes('screenly-viewer')) {
-    document.querySelector('.brand')?.remove()
-  }
 }
 
 const init = (): void => {
