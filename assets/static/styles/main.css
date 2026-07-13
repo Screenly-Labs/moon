@@ -64,6 +64,8 @@ body {
 }
 
 body {
+  min-height: 100vh;
+  /* biome-ignore lint/suspicious/noDuplicateProperties: progressive-enhancement fallback -- 100vh for engines below the svh floor (~2018 players), svh where supported */
   min-height: 100svh;
   background-color: var(--night-2);
   color: var(--star);
@@ -91,6 +93,8 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  min-height: 100vh;
+  /* biome-ignore lint/suspicious/noDuplicateProperties: progressive-enhancement fallback -- 100vh for engines below the svh floor (~2018 players), svh where supported */
   min-height: 100svh;
   padding: clamp(1rem, 3vh, 2.4rem) clamp(1rem, 4vw, 3rem);
   overflow: hidden;
@@ -337,4 +341,23 @@ body {
   html[data-state="ready"] .upcoming {
     animation-delay: 220ms;
   }
+}
+
+/* =========================================================================
+   Degraded mode — old/weak signage players (html.legacy set by the inline gate
+   in Layout.tsx). Assume the device can't afford animation; drop it entirely.
+   Content is already fully legible without the entrance (it only animates the
+   reveal), so nothing needs a resting-state fallback here. !important is
+   required to beat the specificity of the html[data-state="ready"] entrance
+   rules above regardless of cascade.
+   ========================================================================= */
+html.legacy *,
+html.legacy *::before,
+html.legacy *::after {
+  /* biome-ignore lint/complexity/noImportantStyles: kill-switch must override the entrance animation rules */
+  animation: none !important;
+  /* biome-ignore lint/complexity/noImportantStyles: kill-switch must override any transition */
+  transition: none !important;
+  /* biome-ignore lint/complexity/noImportantStyles: release GPU layer hints on weak devices */
+  will-change: auto !important;
 }
