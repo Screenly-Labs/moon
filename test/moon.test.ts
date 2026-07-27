@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test'
-import SunCalc from 'suncalc'
+import * as SunCalc from 'suncalc'
 import {
   formatPhaseDate,
   formatToday,

@@ -11,7 +11,7 @@
 // things: hemisphere (which way the disk is lit/oriented), the timezone used to
 // label "today" and the upcoming-phase dates, and the place name.
 
-import SunCalc from 'suncalc'
+import * as SunCalc from 'suncalc'
 
 export type Hemisphere = 'N' | 'S'
 
