@@ -1,7 +1,10 @@
 // Side-effect import: installs the replaceChildren shim for the older-browser
 // degraded mode (shared across all apps). Must stay first.
 import '@screenly-labs/signage-kit/polyfills'
+import { trackPlayer } from '@screenly-labs/signage-kit/analytics'
+import { PLAYER_PROFILE_PATH } from '@screenly-labs/signage-kit/analytics-server'
 import { removeScreenlyBranding } from '@screenly-labs/signage-kit/branding'
+import { detectPlayer } from '@screenly-labs/signage-kit/profiler'
 import {
   formatPhaseDate,
   formatToday,
@@ -137,8 +140,26 @@ const render = (loc: MoonLocation): void => {
   document.documentElement.dataset.state = 'ready'
 }
 
+// Report which player is showing this. Prefers the Worker's profile over the browser's:
+// only a request carries X-Requested-With, the one signal that names an Android WebView
+// vendor, and the endpoint is no-store so it describes THIS screen rather than whichever
+// one missed the page cache. Falls back to the browser profile when the fetch fails,
+// which on an unattended screen is normal rather than an error: the player still
+// reports, just less specifically, and player_sources records which signals were used.
+const reportPlayer = async (): Promise<void> => {
+  let profile = detectPlayer()
+  try {
+    const response = await fetch(PLAYER_PROFILE_PATH, { cache: 'no-store' })
+    if (response.ok) profile = await response.json()
+  } catch {
+    // Keep the browser-built profile.
+  }
+  trackPlayer(profile, { app: 'moon' })
+}
+
 const init = (): void => {
   removeScreenlyBranding()
+  reportPlayer()
   const loc = readLocation()
   render(loc)
   // Re-render periodically so illumination advances, the date rolls over at
