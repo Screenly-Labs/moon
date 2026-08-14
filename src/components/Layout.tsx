@@ -1,4 +1,6 @@
 import { html, raw } from 'hono/html'
+import { analyticsBootstrap } from '@screenly-labs/signage-kit/analytics-bootstrap'
+import { PLAYER_PROFILE_PATH } from '@screenly-labs/signage-kit/analytics-server'
 import { GATE } from '@screenly-labs/signage-kit/gate'
 import type { Child } from 'hono/jsx'
 
@@ -39,16 +41,11 @@ const Layout = (props: LayoutProps) => html`<!DOCTYPE html>
            stylesheet so html.legacy is set on the first paint. -->
       ${raw(GATE)}
       <link rel="stylesheet" href="/static/styles/main.css?v=${props.v}" />
-      <!-- Google Analytics 4 -->
+      <!-- Google Analytics 4. client_id is pinned to the Screenly device id by the kit
+           bootstrap, so one screen is one GA4 user: GA4's own client_id lives in the _ga
+           cookie and these players largely boot with fresh storage, so it churns. -->
       <script async src="https://www.googletagmanager.com/gtag/js?id=G-QGK9VDL805"></script>
-      <script>
-        window.dataLayer = window.dataLayer || []
-        function gtag() {
-          dataLayer.push(arguments)
-        }
-        gtag('js', new Date())
-        gtag('config', 'G-QGK9VDL805')
-      </script>
+      ${raw(analyticsBootstrap({ gaId: 'G-QGK9VDL805', profilePath: PLAYER_PROFILE_PATH }))}
       <!-- main.js is the bundled, self-executing classic script (no ES module
            export), so a plain async <script> runs it and any cached HTML stays
            compatible across deploys. The ?v= busts it whenever the bundle
