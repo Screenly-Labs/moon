@@ -18,8 +18,8 @@
   "license": "AGPL-3.0-only",
   "dependencies": {
     "@screenly-labs/signage-kit": "github:Screenly-Labs/signage-kit#2026.10.0",
-    "hono": "^4.13.12",
-    "suncalc": "^2.1.0"
+    "hono": "^4.13.13",
+    "suncalc": "^2.1.1"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.15",
